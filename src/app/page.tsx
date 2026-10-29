@@ -15,8 +15,6 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
-export const revalidate = 60; // ISR cache revalidation every minute
-
 export default async function HomePage() {
   const featuredBooks = await getFeaturedBooks(4);
   const allBooksResult = await getBooks({ limit: 8 });

@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Book, BookCategory } from "@/types";
+import { Book } from "@/types";
 import BookCard from "@/components/books/BookCard";
 import {
   Search,

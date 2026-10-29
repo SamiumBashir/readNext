@@ -36,10 +36,11 @@ export default function ProfileEditClient({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
+  const [previewUrl, setPreviewUrl] = useState(initialUser.image || "");
+
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm<ProfileUpdateInput>({
     resolver: zodResolver(profileUpdateSchema),
@@ -48,8 +49,6 @@ export default function ProfileEditClient({
       imageUrl: initialUser.image || "",
     },
   });
-
-  const watchedImageUrl = watch("imageUrl");
 
   const onSubmit = async (data: ProfileUpdateInput) => {
     setIsSubmitting(true);
@@ -123,9 +122,9 @@ export default function ProfileEditClient({
         {/* Live Avatar Preview */}
         <div className="flex items-center gap-5 p-4 rounded-2xl bg-[#FAF8F5] border border-[#E8E2D8]">
           <div className="relative w-16 h-16 rounded-2xl overflow-hidden bg-[#F4EFE6] border border-[#CBD9D0] shrink-0">
-            {watchedImageUrl ? (
+            {previewUrl ? (
               <Image
-                src={watchedImageUrl}
+                src={previewUrl}
                 alt="Avatar Preview"
                 fill
                 className="object-cover"
@@ -151,7 +150,7 @@ export default function ProfileEditClient({
               Avatar Preview
             </span>
             <span className="text-[#839189]">
-              {watchedImageUrl
+              {previewUrl
                 ? "Live preview of updated photo"
                 : "Current profile avatar"}
             </span>
@@ -223,7 +222,9 @@ export default function ProfileEditClient({
                 id="imageUrl"
                 type="url"
                 placeholder="https://images.unsplash.com/..."
-                {...register("imageUrl")}
+                {...register("imageUrl", {
+                  onChange: (e) => setPreviewUrl(e.target.value),
+                })}
                 className={`w-full pl-10 pr-4 py-3 rounded-2xl bg-[#FAF8F5] border text-xs text-[#1D2622] placeholder:text-[#839189] focus:outline-none focus:ring-2 focus:ring-[#183D33] focus:bg-white transition-all ${
                   errors.imageUrl ? "border-red-400" : "border-[#E8E2D8]"
                 }`}

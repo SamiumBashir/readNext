@@ -34,7 +34,7 @@ export default function CuratedSlider({ books }: CuratedSliderProps) {
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#FDF6EC] text-[#C88A3B] border border-[#F1D4A8] mb-2">
             <Sparkles className="w-3.5 h-3.5" />
-            Curator's Spotlight
+            Curator&apos;s Spotlight
           </div>
           <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#1D2622]">
             Interactive Collection Showcase

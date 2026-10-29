@@ -37,7 +37,7 @@ export default function BookCard({ book, featured = false }: BookCardProps) {
         />
 
         {/* Category Badge */}
-        <div className="absolute top-3 left-3 z-10">
+        <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
           <span
             className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${getCategoryStyles(
               book.category
@@ -45,6 +45,11 @@ export default function BookCard({ book, featured = false }: BookCardProps) {
           >
             {book.category}
           </span>
+          {featured && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#183D33]/90 text-[#FAF8F5] backdrop-blur-xs">
+              ★ Curated
+            </span>
+          )}
         </div>
 
         {/* Availability Badge */}

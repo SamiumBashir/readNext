@@ -6,7 +6,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BorrowRecord } from "@/types";
 import {
-  User,
   Mail,
   Calendar,
   Sparkles,
