@@ -2,26 +2,89 @@
 @plugin "daisyui";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #FAF8F5;
+  --foreground: #1D2622;
+  --card-bg: #FFFFFF;
+  --border-subtle: #E8E2D8;
+  --primary: #183D33;
+  --primary-hover: #122E26;
+  --accent: #C88A3B;
+  --accent-light: #FDF6EC;
+  --sage: #52796F;
+  --sage-light: #EBF1ED;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-serif: var(--font-playfair), Georgia, serif;
+  --font-sans: var(--font-jakarta), system-ui, sans-serif;
+  --color-primary: #183D33;
+  --color-primary-hover: #122E26;
+  --color-primary-light: #265548;
+  --color-forest: #183D33;
+  --color-forest-dark: #102720;
+  --color-forest-light: #245246;
+  --color-sage: #52796F;
+  --color-sage-light: #EBF1ED;
+  --color-sage-border: #CBD9D0;
+  --color-parchment: #FAF8F5;
+  --color-parchment-warm: #F4EFE6;
+  --color-parchment-deep: #ECE5DA;
+  --color-amber-gold: #C88A3B;
+  --color-amber-soft: #FDF6EC;
+  --color-amber-border: #F1D4A8;
+  --color-charcoal: #1D2622;
+  --color-charcoal-muted: #586860;
+  --color-charcoal-subtle: #899B92;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3, h4, .font-editorial {
+  font-family: var(--font-serif);
+}
+
+/* Custom scrollbar for library feel */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F4EFE6;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5CF;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9FB1A6;
+}
+
+/* Marquee continuous scroll animation */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 35s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+    overflow-x: auto;
+  }
 }
