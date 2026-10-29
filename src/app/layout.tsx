@@ -33,8 +33,12 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${playfair.variable} ${jakarta.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-[#FAF8F5] text-[#1D2622]">
+      <body
+        className="min-h-full flex flex-col bg-[#FAF8F5] text-[#1D2622]"
+        suppressHydrationWarning
+      >
         <Navbar />
         <main className="flex-1 flex flex-col">{children}</main>
         <Footer />
