@@ -14,7 +14,7 @@
 ## 🔗 Project Links
 
 - **Live Deployment**: `https://readnest-library.vercel.app` *(Production deployment placeholder)*
-- **GitHub Repository**: `https://github.com/your-username/online-book-borrowing-platform` *(Repository placeholder)*
+- **GitHub Repository**: [https://github.com/SamiumBashir/readNext](https://github.com/SamiumBashir/readNext)
 
 ---
 
