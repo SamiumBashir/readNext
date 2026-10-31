@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
+import { isUserAdmin } from "@/lib/admin";
 import {
   BookOpen,
   Menu,
@@ -40,10 +41,12 @@ export default function Navbar() {
     }
   };
 
+  const isAdmin = isUserAdmin(session?.user);
+
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "All Books", href: "/books" },
-    { name: "Upload Book", href: "/admin", protected: true },
+    ...(isAdmin ? [{ name: "Upload Book", href: "/admin", protected: true }] : []),
     { name: "My Profile", href: "/profile", protected: true },
   ];
 
@@ -109,13 +112,15 @@ export default function Navbar() {
               <div className="h-10 w-28 bg-[#E8E2D8]/60 animate-pulse rounded-full" />
             ) : session?.user ? (
               <div className="flex items-center gap-2.5">
-                <Link
-                  href="/admin"
-                  className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold bg-[#FAF8F5] hover:bg-[#183D33] text-[#183D33] hover:text-[#FAF8F5] border border-[#CBD9D0] transition-colors shadow-2xs"
-                >
-                  <BookPlus className="w-3.5 h-3.5 text-[#C88A3B]" />
-                  <span>Upload Book</span>
-                </Link>
+                {isAdmin && (
+                  <Link
+                    href="/admin"
+                    className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold bg-[#FAF8F5] hover:bg-[#183D33] text-[#183D33] hover:text-[#FAF8F5] border border-[#CBD9D0] transition-colors shadow-2xs"
+                  >
+                    <BookPlus className="w-3.5 h-3.5 text-[#C88A3B]" />
+                    <span>Upload Book</span>
+                  </Link>
+                )}
 
                 <div className="relative">
                   <button
@@ -164,14 +169,16 @@ export default function Navbar() {
                       </div>
 
                       <div className="py-1">
-                        <Link
-                          href="/admin"
-                          onClick={() => setUserDropdownOpen(false)}
-                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#183D33] font-semibold hover:bg-[#F4EFE6] transition-colors"
-                        >
-                          <BookPlus className="w-4 h-4 text-[#C88A3B]" />
-                          <span>Upload / Admin Studio</span>
-                        </Link>
+                        {isAdmin && (
+                          <Link
+                            href="/admin"
+                            onClick={() => setUserDropdownOpen(false)}
+                            className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#183D33] font-semibold hover:bg-[#F4EFE6] transition-colors"
+                          >
+                            <BookPlus className="w-4 h-4 text-[#C88A3B]" />
+                            <span>Upload / Admin Studio</span>
+                          </Link>
+                        )}
                         <Link
                           href="/profile"
                           onClick={() => setUserDropdownOpen(false)}

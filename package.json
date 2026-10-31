@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "db:seed": "tsx src/scripts/seed.ts",
-    "test": "tsx --test tests/validations.test.ts tests/borrow-logic.test.ts tests/catalog-filter.test.ts"
+    "test": "tsx --test tests/validations.test.ts tests/borrow-logic.test.ts tests/catalog-filter.test.ts tests/admin-auth.test.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^6.0.2",

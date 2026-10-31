@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
+import { isUserAdmin } from "@/lib/admin";
 import { getBooks, createBook, deleteBook } from "@/services/book.service";
 import { createBookSchema } from "@/lib/validations";
 
@@ -43,6 +44,17 @@ export async function POST(request: NextRequest) {
           message: "Authentication required to publish books into the archive.",
         },
         { status: 401 }
+      );
+    }
+
+    if (!isUserAdmin(session.user)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "Forbidden: Only verified library administrators can publish new volumes.",
+        },
+        { status: 403 }
       );
     }
 
@@ -138,6 +150,17 @@ export async function DELETE(request: NextRequest) {
           message: "Authentication required to remove books from the archive.",
         },
         { status: 401 }
+      );
+    }
+
+    if (!isUserAdmin(session.user)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "Forbidden: Only verified library administrators can remove volumes.",
+        },
+        { status: 403 }
       );
     }
 
