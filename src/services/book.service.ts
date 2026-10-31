@@ -183,3 +183,55 @@ export async function getBookById(id: string): Promise<Book | null> {
     return null;
   }
 }
+
+export function generateBookId(title: string, category: string): string {
+  const cleanTitle = title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "")
+    .slice(0, 30);
+  const cat = category.toLowerCase().slice(0, 5);
+  const randomSuffix = Math.random().toString(36).substring(2, 7);
+  return `${cat}-${cleanTitle || "volume"}-${randomSuffix}`;
+}
+
+export async function createBook(
+  input: Omit<Book, "_id" | "id" | "created_at"> & { id?: string }
+): Promise<Book> {
+  const db = await getDb();
+  const collection = db.collection<Book>("books");
+
+  await ensureBookIndexes();
+
+  const count = await collection.countDocuments();
+  if (count === 0) {
+    await seedBooks();
+  }
+
+  const id = input.id || generateBookId(input.title, input.category);
+
+  const newBook: Book = {
+    ...input,
+    id,
+    created_at: new Date(),
+  };
+
+  const result = await collection.insertOne(newBook as any);
+
+  return {
+    ...newBook,
+    _id: result.insertedId.toString(),
+  };
+}
+
+export async function deleteBook(id: string): Promise<boolean> {
+  try {
+    const db = await getDb();
+    const collection = db.collection<Book>("books");
+    const result = await collection.deleteOne({ id });
+    return result.deletedCount > 0;
+  } catch (error) {
+    console.error(`Error deleting book ${id} from MongoDB:`, error);
+    return false;
+  }
+}

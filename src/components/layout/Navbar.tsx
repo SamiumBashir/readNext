@@ -14,6 +14,7 @@ import {
   ChevronDown,
   Bookmark,
   Sparkles,
+  BookPlus,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -42,6 +43,7 @@ export default function Navbar() {
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "All Books", href: "/books" },
+    { name: "Upload Book", href: "/admin", protected: true },
     { name: "My Profile", href: "/profile", protected: true },
   ];
 
@@ -106,13 +108,22 @@ export default function Navbar() {
             {isPending ? (
               <div className="h-10 w-28 bg-[#E8E2D8]/60 animate-pulse rounded-full" />
             ) : session?.user ? (
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                  className="flex items-center gap-2.5 p-1.5 pr-3 rounded-full hover:bg-[#F4EFE6] border border-transparent hover:border-[#E8E2D8] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#183D33]"
-                  aria-expanded={userDropdownOpen}
+              <div className="flex items-center gap-2.5">
+                <Link
+                  href="/admin"
+                  className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold bg-[#FAF8F5] hover:bg-[#183D33] text-[#183D33] hover:text-[#FAF8F5] border border-[#CBD9D0] transition-colors shadow-2xs"
                 >
+                  <BookPlus className="w-3.5 h-3.5 text-[#C88A3B]" />
+                  <span>Upload Book</span>
+                </Link>
+
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                    className="flex items-center gap-2.5 p-1.5 pr-3 rounded-full hover:bg-[#F4EFE6] border border-transparent hover:border-[#E8E2D8] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#183D33]"
+                    aria-expanded={userDropdownOpen}
+                  >
                   {session.user.image && !imgError ? (
                     <div className="relative w-9 h-9 rounded-full overflow-hidden border border-[#C88A3B]/40">
                       <Image
@@ -154,6 +165,14 @@ export default function Navbar() {
 
                       <div className="py-1">
                         <Link
+                          href="/admin"
+                          onClick={() => setUserDropdownOpen(false)}
+                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#183D33] font-semibold hover:bg-[#F4EFE6] transition-colors"
+                        >
+                          <BookPlus className="w-4 h-4 text-[#C88A3B]" />
+                          <span>Upload / Admin Studio</span>
+                        </Link>
+                        <Link
                           href="/profile"
                           onClick={() => setUserDropdownOpen(false)}
                           className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-[#1D2622] hover:bg-[#F4EFE6] transition-colors"
@@ -185,7 +204,8 @@ export default function Navbar() {
                   </>
                 )}
               </div>
-            ) : (
+            </div>
+          ) : (
               <div className="flex items-center gap-2">
                 <Link
                   href="/login"

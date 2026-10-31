@@ -5,6 +5,7 @@ import {
   loginSchema,
   profileUpdateSchema,
   borrowSchema,
+  createBookSchema,
 } from "../src/lib/validations";
 
 describe("Registration Validation (registerSchema)", () => {
@@ -125,6 +126,77 @@ describe("Borrowing Schema Validation (borrowSchema)", () => {
 
   test("rejects missing or empty book ID", () => {
     const result = borrowSchema.safeParse({ bookId: "" });
+    assert.strictEqual(result.success, false);
+  });
+});
+
+describe("Admin Book Upload Schema Validation (createBookSchema)", () => {
+  test("accepts valid book creation payload", () => {
+    const validBook = {
+      title: "Clean Code",
+      author: "Robert C. Martin",
+      description: "A handbook of agile software craftsmanship and best practices.",
+      category: "Tech",
+      available_quantity: 5,
+      image_url: "/images/hero-showcase.jpg",
+      featured: true,
+      pages: 464,
+      published_year: 2008,
+      isbn: "978-0132350884",
+    };
+    const result = createBookSchema.safeParse(validBook);
+    assert.strictEqual(result.success, true);
+  });
+
+  test("accepts valid base64 data URL for uploaded cover image", () => {
+    const bookWithDataUrl = {
+      title: "Design Patterns",
+      author: "Gang of Four",
+      description: "Elements of reusable object-oriented software architecture.",
+      category: "Tech",
+      available_quantity: 3,
+      image_url: "data:image/jpeg;base64,/9j/4AAQSkZJRg==",
+    };
+    const result = createBookSchema.safeParse(bookWithDataUrl);
+    assert.strictEqual(result.success, true);
+  });
+
+  test("rejects invalid book category", () => {
+    const invalidCategory = {
+      title: "Random Book",
+      author: "Unknown",
+      description: "A test book description that is long enough.",
+      category: "Fantasy", // Not in Story | Tech | Science
+      available_quantity: 2,
+      image_url: "/images/hero-showcase.jpg",
+    };
+    const result = createBookSchema.safeParse(invalidCategory);
+    assert.strictEqual(result.success, false);
+  });
+
+  test("rejects negative or zero available quantity", () => {
+    const zeroQuantity = {
+      title: "Zero Stock",
+      author: "Author",
+      description: "A valid description for testing zero quantity.",
+      category: "Science",
+      available_quantity: 0,
+      image_url: "/images/hero-showcase.jpg",
+    };
+    const result = createBookSchema.safeParse(zeroQuantity);
+    assert.strictEqual(result.success, false);
+  });
+
+  test("rejects empty image_url", () => {
+    const noImage = {
+      title: "No Image Book",
+      author: "Author",
+      description: "A valid description for testing missing image.",
+      category: "Story",
+      available_quantity: 2,
+      image_url: "",
+    };
+    const result = createBookSchema.safeParse(noImage);
     assert.strictEqual(result.success, false);
   });
 });
