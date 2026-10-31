@@ -158,7 +158,7 @@ export default async function HomePage() {
                 <div className="relative bg-white rounded-3xl p-6 border border-[#E8E2D8] shadow-2xl space-y-5">
                   <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden bg-[#F4EFE6]">
                     <Image
-                      src="https://images.unsplash.com/photo-1507842229451-7f61d4dc18c5?auto=format&fit=crop&q=80&w=1200"
+                      src="/images/hero-showcase.jpg"
                       alt="ReadNest Library Showcase"
                       fill
                       priority

@@ -41,7 +41,7 @@ export const INITIAL_BOOKS: Book[] = [
     category: "Story",
     available_quantity: 3,
     image_url:
-      "https://images.unsplash.com/photo-1532012164546-f432f2e37273?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&q=80&w=800",
     featured: true,
     pages: 328,
     published_year: 1949,
@@ -210,7 +210,7 @@ export const INITIAL_BOOKS: Book[] = [
     category: "Science",
     available_quantity: 6,
     image_url:
-      "https://images.unsplash.com/photo-1507842229451-7f61d4dc18c5?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&q=80&w=800",
     featured: false,
     pages: 464,
     published_year: 2014,
