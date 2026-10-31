@@ -23,6 +23,7 @@ export default function Navbar() {
   const { data: session, isPending } = authClient.useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [imgError, setImgError] = useState(false);
 
   const handleSignOut = async () => {
     try {
@@ -112,7 +113,7 @@ export default function Navbar() {
                   className="flex items-center gap-2.5 p-1.5 pr-3 rounded-full hover:bg-[#F4EFE6] border border-transparent hover:border-[#E8E2D8] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#183D33]"
                   aria-expanded={userDropdownOpen}
                 >
-                  {session.user.image ? (
+                  {session.user.image && !imgError ? (
                     <div className="relative w-9 h-9 rounded-full overflow-hidden border border-[#C88A3B]/40">
                       <Image
                         src={session.user.image}
@@ -120,6 +121,7 @@ export default function Navbar() {
                         fill
                         className="object-cover"
                         unoptimized
+                        onError={() => setImgError(true)}
                       />
                     </div>
                   ) : (
@@ -253,7 +255,7 @@ export default function Navbar() {
             {session?.user ? (
               <div className="space-y-3">
                 <div className="flex items-center gap-3 px-2 py-1">
-                  {session.user.image ? (
+                  {session.user.image && !imgError ? (
                     <div className="relative w-10 h-10 rounded-full overflow-hidden border border-[#C88A3B]/40">
                       <Image
                         src={session.user.image}
@@ -261,6 +263,7 @@ export default function Navbar() {
                         fill
                         className="object-cover"
                         unoptimized
+                        onError={() => setImgError(true)}
                       />
                     </div>
                   ) : (

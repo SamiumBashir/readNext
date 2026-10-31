@@ -38,6 +38,7 @@ export default function ProfileClient({
   const router = useRouter();
   const [records, setRecords] = useState<BorrowRecord[]>(initialRecords);
   const [returningId, setReturningId] = useState<string | null>(null);
+  const [avatarError, setAvatarError] = useState(false);
 
   const activeRecords = records.filter((r) => r.status === "active");
   const returnedRecords = records.filter((r) => r.status === "returned");
@@ -98,7 +99,7 @@ export default function ProfileClient({
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8">
           {/* Avatar */}
           <div className="relative group shrink-0">
-            {user.image ? (
+            {user.image && !avatarError ? (
               <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden border-2 border-[#183D33] shadow-md bg-[#F4EFE6]">
                 <Image
                   src={user.image}
@@ -106,6 +107,7 @@ export default function ProfileClient({
                   fill
                   className="object-cover"
                   unoptimized
+                  onError={() => setAvatarError(true)}
                 />
               </div>
             ) : (

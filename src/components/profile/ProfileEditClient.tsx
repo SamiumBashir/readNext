@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,6 +17,8 @@ import {
   CheckCircle2,
   AlertCircle,
   Sparkles,
+  UploadCloud,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -37,10 +39,15 @@ export default function ProfileEditClient({
   const [serverError, setServerError] = useState<string | null>(null);
 
   const [previewUrl, setPreviewUrl] = useState(initialUser.image || "");
+  const [imgError, setImgError] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [fileName, setFileName] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<ProfileUpdateInput>({
     resolver: zodResolver(profileUpdateSchema),
@@ -49,6 +56,98 @@ export default function ProfileEditClient({
       imageUrl: initialUser.image || "",
     },
   });
+
+  const processFile = (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file (PNG, JPG, WebP, etc.)");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image file size should be less than 5MB");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      if (!dataUrl) return;
+
+      const img = document.createElement("img");
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const MAX_SIZE = 400;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_SIZE) {
+            height = Math.round((height * MAX_SIZE) / width);
+            width = MAX_SIZE;
+          }
+        } else {
+          if (height > MAX_SIZE) {
+            width = Math.round((width * MAX_SIZE) / height);
+            height = MAX_SIZE;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressed = canvas.toDataURL("image/jpeg", 0.88);
+          setPreviewUrl(compressed);
+          setImgError(false);
+          setValue("imageUrl", compressed, {
+            shouldValidate: true,
+            shouldDirty: true,
+          });
+          setFileName(file.name);
+          toast.success("Photo selected and preview updated!");
+        } else {
+          setPreviewUrl(dataUrl);
+          setImgError(false);
+          setValue("imageUrl", dataUrl, {
+            shouldValidate: true,
+            shouldDirty: true,
+          });
+          setFileName(file.name);
+          toast.success("Photo selected and preview updated!");
+        }
+      };
+      img.onerror = () => {
+        toast.error("Failed to process image file");
+      };
+      img.src = dataUrl;
+    };
+    reader.onerror = () => {
+      toast.error("Failed to read image file");
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      processFile(file);
+    }
+  };
+
+  const handleRemovePhoto = () => {
+    setPreviewUrl("");
+    setFileName(null);
+    setImgError(false);
+    setValue("imageUrl", "", {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+    toast.info("Profile photo removed. Click 'Update Information' to save.");
+  };
 
   const onSubmit = async (data: ProfileUpdateInput) => {
     setIsSubmitting(true);
@@ -122,21 +221,23 @@ export default function ProfileEditClient({
         {/* Live Avatar Preview */}
         <div className="flex items-center gap-5 p-4 rounded-2xl bg-[#FAF8F5] border border-[#E8E2D8]">
           <div className="relative w-16 h-16 rounded-2xl overflow-hidden bg-[#F4EFE6] border border-[#CBD9D0] shrink-0">
-            {previewUrl ? (
+            {previewUrl && !imgError ? (
               <Image
                 src={previewUrl}
                 alt="Avatar Preview"
                 fill
                 className="object-cover"
                 unoptimized
+                onError={() => setImgError(true)}
               />
-            ) : initialUser.image ? (
+            ) : initialUser.image && !imgError ? (
               <Image
                 src={initialUser.image}
                 alt="Current Avatar"
                 fill
                 className="object-cover"
                 unoptimized
+                onError={() => setImgError(true)}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center font-serif text-lg font-bold text-[#183D33]">
@@ -150,7 +251,7 @@ export default function ProfileEditClient({
               Avatar Preview
             </span>
             <span className="text-[#839189]">
-              {previewUrl
+              {previewUrl && !imgError
                 ? "Live preview of updated photo"
                 : "Current profile avatar"}
             </span>
@@ -205,31 +306,88 @@ export default function ProfileEditClient({
             )}
           </div>
 
-          {/* Image URL Input */}
-          <div className="space-y-1">
+          {/* Profile Photo Upload Option */}
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label
-                htmlFor="imageUrl"
-                className="block text-xs font-semibold text-[#183D33]"
-              >
-                Profile Image URL
+              <label className="block text-xs font-semibold text-[#183D33]">
+                Profile Photo
               </label>
-              <span className="text-[11px] text-[#839189]">Web link</span>
+              <span className="text-[11px] text-[#839189]">Device upload</span>
             </div>
-            <div className="relative flex items-center">
-              <ImageIcon className="absolute left-3.5 w-4 h-4 text-[#839189]" />
-              <input
-                id="imageUrl"
-                type="url"
-                placeholder="https://images.unsplash.com/..."
-                {...register("imageUrl", {
-                  onChange: (e) => setPreviewUrl(e.target.value),
-                })}
-                className={`w-full pl-10 pr-4 py-3 rounded-2xl bg-[#FAF8F5] border text-xs text-[#1D2622] placeholder:text-[#839189] focus:outline-none focus:ring-2 focus:ring-[#183D33] focus:bg-white transition-all ${
-                  errors.imageUrl ? "border-red-400" : "border-[#E8E2D8]"
-                }`}
-              />
+
+            {/* Hidden native file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+
+            {/* Upload Area / Dropzone */}
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setIsDragging(true);
+              }}
+              onDragLeave={() => setIsDragging(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setIsDragging(false);
+                const file = e.dataTransfer.files?.[0];
+                if (file) processFile(file);
+              }}
+              className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all ${
+                isDragging
+                  ? "border-[#183D33] bg-[#EBF1ED]"
+                  : "border-[#CBD9D0] hover:border-[#183D33] bg-[#FAF8F5] hover:bg-[#F4EFE6]/60"
+              }`}
+            >
+              <div className="flex flex-col items-center justify-center gap-2">
+                <div className="w-12 h-12 rounded-2xl bg-white border border-[#E8E2D8] flex items-center justify-center text-[#183D33] shadow-2xs">
+                  <UploadCloud className="w-6 h-6 text-[#183D33]" />
+                </div>
+                <div className="space-y-0.5">
+                  <p className="text-xs font-semibold text-[#183D33]">
+                    Click to upload photo <span className="font-normal text-[#586860]">or drag and drop</span>
+                  </p>
+                  <p className="text-[11px] text-[#839189]">
+                    PNG, JPG, or WebP (max. 5MB)
+                  </p>
+                </div>
+              </div>
             </div>
+
+            {/* Action pill if image selected / uploaded */}
+            {(previewUrl || fileName) && (
+              <div className="flex items-center justify-between p-3 rounded-xl bg-[#FAF8F5] border border-[#E8E2D8] text-xs">
+                <div className="flex items-center gap-2 text-[#183D33] truncate max-w-[200px] sm:max-w-xs">
+                  <ImageIcon className="w-4 h-4 text-[#C88A3B] shrink-0" />
+                  <span className="truncate font-medium">
+                    {fileName || "Profile photo ready"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-3 py-1.5 rounded-lg text-xs font-semibold text-[#183D33] hover:bg-[#EBF1ED] border border-[#CBD9D0] transition-colors cursor-pointer"
+                  >
+                    Change
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleRemovePhoto}
+                    className="px-3 py-1.5 rounded-lg text-xs font-semibold text-red-600 hover:bg-red-50 border border-red-200 transition-colors flex items-center gap-1 cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Remove</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
             {errors.imageUrl && (
               <p className="text-[11px] text-red-600 font-medium pl-1">
                 {errors.imageUrl.message}

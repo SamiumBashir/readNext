@@ -14,7 +14,16 @@ export const registerSchema = z.object({
   photoUrl: z
     .string()
     .trim()
-    .url("Must be a valid URL")
+    .refine((val) => {
+      if (!val) return true;
+      if (val.startsWith("data:image/") || val.startsWith("/")) return true;
+      try {
+        const url = new URL(val);
+        return url.protocol === "http:" || url.protocol === "https:";
+      } catch {
+        return false;
+      }
+    }, "Must be a valid URL or image")
     .optional()
     .or(z.literal("")),
   password: z
@@ -46,7 +55,16 @@ export const profileUpdateSchema = z.object({
   imageUrl: z
     .string()
     .trim()
-    .url("Image must be a valid web URL")
+    .refine((val) => {
+      if (!val) return true;
+      if (val.startsWith("data:image/") || val.startsWith("/")) return true;
+      try {
+        const url = new URL(val);
+        return url.protocol === "http:" || url.protocol === "https:";
+      } catch {
+        return false;
+      }
+    }, "Image must be a valid image file, data URL, or web link")
     .optional()
     .or(z.literal("")),
 });
