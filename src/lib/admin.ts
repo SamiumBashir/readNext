@@ -42,3 +42,4 @@ export function isUserAdmin(
 
   return adminEmails.includes(normalizedEmail);
 }
+

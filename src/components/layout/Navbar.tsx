@@ -46,7 +46,6 @@ export default function Navbar() {
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "All Books", href: "/books" },
-    ...(isAdmin ? [{ name: "Upload Book", href: "/admin", protected: true }] : []),
     { name: "My Profile", href: "/profile", protected: true },
   ];
 
@@ -276,6 +275,20 @@ export default function Navbar() {
                 </Link>
               );
             })}
+
+            {isAdmin && (
+              <Link
+                href="/admin"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-4 py-3 rounded-xl text-base font-medium flex items-center justify-between text-[#183D33] hover:bg-[#F4EFE6]"
+              >
+                <span className="flex items-center gap-2">
+                  <BookPlus className="w-4 h-4 text-[#C88A3B]" />
+                  <span>Upload Book (Admin)</span>
+                </span>
+                <Bookmark className="w-4 h-4 opacity-70" />
+              </Link>
+            )}
           </nav>
 
           <div className="pt-3 border-t border-[#E8E2D8]">

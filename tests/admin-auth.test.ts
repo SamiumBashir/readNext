@@ -62,3 +62,4 @@ describe("Admin & Curator Access Control (isUserAdmin)", () => {
     assert.strictEqual(isUserAdmin({ email: null }), false);
   });
 });
+
