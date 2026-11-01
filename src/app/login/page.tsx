@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, LoginInput } from "@/lib/validations";
 import { authClient } from "@/lib/auth-client";
+import { isUserAdmin } from "@/lib/admin";
 import {
   BookOpen,
   Mail,
@@ -64,8 +65,18 @@ function LoginForm() {
         return;
       }
 
-      toast.success("Welcome back to ReadNest!");
-      router.push(safeCallbackUrl);
+      const isAdmin = isUserAdmin({
+        email: data.email,
+        role: (response.data as any)?.user?.role,
+      });
+
+      if (isAdmin) {
+        toast.success("Welcome back, Curator Admin!");
+        router.push(safeCallbackUrl === "/" ? "/admin" : safeCallbackUrl);
+      } else {
+        toast.success("Welcome back to ReadNest!");
+        router.push(safeCallbackUrl);
+      }
       router.refresh();
     } catch (err: unknown) {
       const message =

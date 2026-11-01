@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { BorrowRecord } from "@/types";
+import { isUserAdmin } from "@/lib/admin";
 import {
   Mail,
   Calendar,
@@ -141,13 +142,24 @@ export default function ProfileClient({
                 </p>
               </div>
 
-              <Link
-                href="/profile/edit"
-                className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full text-xs font-semibold bg-[#FAF8F5] hover:bg-[#183D33] text-[#183D33] hover:text-[#FAF8F5] border border-[#E8E2D8] hover:border-[#183D33] transition-all shadow-2xs self-center sm:self-start"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-[#C88A3B]" />
-                <span>Edit Profile</span>
-              </Link>
+              <div className="flex flex-wrap items-center gap-2.5 self-center sm:self-start">
+                {isUserAdmin(user) && (
+                  <Link
+                    href="/admin"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-xs font-semibold bg-[#174B32] text-white hover:bg-[#103B29] transition-all shadow-xs"
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#F4A623]" />
+                    <span>Admin Dashboard</span>
+                  </Link>
+                )}
+                <Link
+                  href="/profile/edit"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full text-xs font-semibold bg-[#FAF8F5] hover:bg-[#183D33] text-[#183D33] hover:text-[#FAF8F5] border border-[#E8E2D8] hover:border-[#183D33] transition-all shadow-2xs"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-[#C88A3B]" />
+                  <span>Edit Profile</span>
+                </Link>
+              </div>
             </div>
 
             <div className="pt-2 text-xs text-[#839189] flex items-center justify-center sm:justify-start gap-2">

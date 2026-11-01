@@ -108,17 +108,7 @@ export default function Navbar() {
             {isPending ? (
               <div className="h-10 w-28 bg-[#E8E2D8]/60 animate-pulse rounded-full" />
             ) : session?.user ? (
-              <>
-                {isUserAdmin(session.user) && (
-                  <Link
-                    href="/admin"
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold text-white bg-[#174B32] hover:bg-[#103B29] transition-all shadow-xs"
-                  >
-                    <ShieldCheck className="w-3.5 h-3.5 text-[#F4A623]" />
-                    <span>Admin Dashboard</span>
-                  </Link>
-                )}
-                <div className="relative">
+              <div className="relative">
                 <button
                   type="button"
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
@@ -207,7 +197,6 @@ export default function Navbar() {
                   </>
                 )}
               </div>
-            </>
             ) : (
               <div className="flex items-center gap-2">
                 <Link
