@@ -99,6 +99,12 @@ export const createBookSchema = z.object({
     .int("Quantity must be a whole number")
     .min(1, "Available quantity must be at least 1")
     .max(500, "Quantity cannot exceed 500"),
+  total_copies: z
+    .number()
+    .int("Total copies must be a whole number")
+    .min(1, "Total copies must be at least 1")
+    .max(500, "Total copies cannot exceed 500")
+    .optional(),
   image_url: z
     .string()
     .trim()
@@ -130,3 +136,15 @@ export const createBookSchema = z.object({
 });
 
 export type CreateBookInput = z.infer<typeof createBookSchema>;
+
+export const updateBookSchema = createBookSchema.partial().extend({
+  id: z.string().min(1, "Book ID is required for editing"),
+  available_quantity: z
+    .number()
+    .int("Quantity must be a whole number")
+    .min(0, "Available quantity cannot be negative")
+    .max(500, "Quantity cannot exceed 500")
+    .optional(),
+});
+
+export type UpdateBookInput = z.infer<typeof updateBookSchema>;

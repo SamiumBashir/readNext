@@ -3,8 +3,8 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { isUserAdmin } from "@/lib/admin";
-import { getBooks, createBook, deleteBook } from "@/services/book.service";
-import { createBookSchema } from "@/lib/validations";
+import { getBooks, createBook, deleteBook, updateBook } from "@/services/book.service";
+import { createBookSchema, updateBookSchema } from "@/lib/validations";
 
 export async function GET(request: NextRequest) {
   try {
@@ -203,3 +203,105 @@ export async function DELETE(request: NextRequest) {
     );
   }
 }
+
+export async function PUT(request: NextRequest) {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session || !session.user) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Authentication required to modify book archive.",
+        },
+        { status: 401 }
+      );
+    }
+
+    if (!isUserAdmin(session.user)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "Forbidden: Only verified library administrators can modify volumes.",
+        },
+        { status: 403 }
+      );
+    }
+
+    const body = await request.json();
+    const formattedBody = {
+      ...body,
+      available_quantity:
+        typeof body.available_quantity === "string"
+          ? parseInt(body.available_quantity, 10)
+          : body.available_quantity,
+      total_copies:
+        typeof body.total_copies === "string"
+          ? parseInt(body.total_copies, 10)
+          : body.total_copies,
+      pages:
+        typeof body.pages === "string" && body.pages.trim() !== ""
+          ? parseInt(body.pages, 10)
+          : body.pages,
+      published_year:
+        typeof body.published_year === "string" && body.published_year.trim() !== ""
+          ? parseInt(body.published_year, 10)
+          : body.published_year,
+    };
+
+    const parsed = updateBookSchema.safeParse(formattedBody);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: parsed.error.issues[0]?.message || "Validation failed",
+          errors: parsed.error.issues,
+        },
+        { status: 400 }
+      );
+    }
+
+    const { id, ...updates } = parsed.data;
+
+    // Filter out undefined values
+    const cleanUpdates: any = {};
+    for (const [key, val] of Object.entries(updates)) {
+      if (val !== undefined) {
+        cleanUpdates[key] = val;
+      }
+    }
+
+    const updated = await updateBook(id, cleanUpdates);
+
+    if (!updated) {
+      return NextResponse.json(
+        { success: false, message: "Book was not found or could not be updated." },
+        { status: 404 }
+      );
+    }
+
+    revalidatePath("/books");
+    revalidatePath("/");
+    revalidatePath("/admin");
+
+    return NextResponse.json({
+      success: true,
+      message: `Book “${updated.title}” updated successfully.`,
+      book: updated,
+    });
+  } catch (error) {
+    console.error("API PUT /api/books error:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Internal server error occurred while updating book.",
+      },
+      { status: 500 }
+    );
+  }
+}
+

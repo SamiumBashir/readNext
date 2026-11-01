@@ -235,3 +235,51 @@ export async function deleteBook(id: string): Promise<boolean> {
     return false;
   }
 }
+
+export async function updateBook(
+  id: string,
+  updates: Partial<Omit<Book, "_id" | "id">>
+): Promise<Book | null> {
+  try {
+    const db = await getDb();
+    const collection = db.collection<Book>("books");
+
+    const result = await collection.findOneAndUpdate(
+      { id },
+      { $set: updates },
+      { returnDocument: "after" }
+    );
+
+    if (!result) return null;
+
+    return {
+      ...result,
+      _id: result._id?.toString(),
+    };
+  } catch (error) {
+    console.error(`Error updating book ${id}:`, error);
+    return null;
+  }
+}
+
+export async function getAllBooksAdmin(): Promise<Book[]> {
+  try {
+    const db = await getDb();
+    const collection = db.collection<Book>("books");
+
+    const count = await collection.countDocuments();
+    if (count === 0) {
+      await seedBooks();
+    }
+
+    const books = await collection.find({}).sort({ title: 1 }).toArray();
+
+    return books.map((doc) => ({
+      ...doc,
+      _id: doc._id?.toString(),
+    }));
+  } catch (error) {
+    console.error("Error fetching all books for admin:", error);
+    return [];
+  }
+}

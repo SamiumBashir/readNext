@@ -1,17 +1,20 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
-import { isUserAdmin } from "@/lib/admin";
-import { getBooks } from "@/services/book.service";
-import AdminStudioClient from "@/components/admin/AdminStudioClient";
-import { ShieldAlert, ArrowLeft } from "lucide-react";
+import { isUserAdmin, getAdminEmails } from "@/lib/admin";
+import { getAllBooksAdmin } from "@/services/book.service";
+import { getAllUsersAdmin } from "@/services/user.service";
+import {
+  getAllBorrowRecordsAdmin,
+  getDashboardAnalytics,
+} from "@/services/borrow.service";
+import AdminDashboardApp from "@/components/admin/AdminDashboardApp";
 
 export const metadata: Metadata = {
-  title: "Admin Book Studio — ReadNest Library",
+  title: "Admin Dashboard & Curator Console — ReadNext",
   description:
-    "Curator administration interface for uploading, publishing, and managing library books and stock.",
+    "Professional SaaS administration panel for managing books, readers, loans, returns, and library analytics.",
 };
 
 export default async function AdminPage() {
@@ -19,54 +22,51 @@ export default async function AdminPage() {
     headers: await headers(),
   });
 
-  // 1. Unauthenticated users are redirected to login
+  // 1. Unauthenticated visitors cannot access /admin
   if (!session || !session.user) {
     redirect("/login?callbackUrl=/admin");
   }
 
-  // 2. Normal readers (non-admin) are blocked with access restriction
+  // 2. Normal readers (non-admin) are strictly blocked from accessing /admin - immediately redirected to home
   if (!isUserAdmin(session.user)) {
-    return (
-      <div className="min-h-[70vh] flex items-center justify-center px-4 py-16">
-        <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-[#E8E2D8] shadow-sm text-center space-y-6">
-          <div className="w-16 h-16 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mx-auto border border-red-200 shadow-2xs">
-            <ShieldAlert className="w-8 h-8" />
-          </div>
-          <div className="space-y-2">
-            <h1 className="font-serif text-2xl font-bold text-[#183D33]">
-              Curator Access Restricted
-            </h1>
-            <p className="text-xs sm:text-sm text-[#586860] leading-relaxed">
-              Your account (<span className="font-semibold text-[#183D33]">{session.user.email}</span>) is registered as a general Reader Member. Only designated library administrators can access the Book Upload Studio.
-            </p>
-          </div>
-          <div className="pt-2">
-            <Link
-              href="/"
-              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full text-xs font-semibold bg-[#183D33] hover:bg-[#122E26] text-[#FAF8F5] transition-all shadow-sm hover:shadow"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Return to Public Library</span>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
+    redirect("/");
   }
 
-  // Retrieve initial catalog of books for inventory management
-  const booksResult = await getBooks({
-    limit: 100,
-  });
+  // 3. Fetch comprehensive data concurrently from MongoDB
+  const [books, users, borrowsData, analytics] = await Promise.all([
+    getAllBooksAdmin(),
+    getAllUsersAdmin(),
+    getAllBorrowRecordsAdmin({ limit: 100 }),
+    getDashboardAnalytics(),
+  ]);
+
+  const adminEmails = getAdminEmails();
+
+  // Extract core stats
+  const stats = {
+    totalBooks: analytics.totalBooks,
+    registeredUsers: analytics.registeredUsers,
+    totalBorrowed: analytics.totalBorrowed,
+    currentlyBorrowed: analytics.currentlyBorrowed,
+    overdueBooks: analytics.overdueBooks,
+    availableBooks: analytics.availableBooks,
+    totalCopies: analytics.totalCopies,
+    returnRate: analytics.returnRate,
+    categoryCounts: analytics.categoryCounts,
+  };
 
   return (
-    <AdminStudioClient
-      initialBooks={booksResult.books}
+    <AdminDashboardApp
+      initialBooks={books}
+      initialUsers={users}
+      initialBorrows={borrowsData.records}
+      initialStats={stats}
+      initialAnalytics={analytics}
       user={{
         name: session.user.name,
         email: session.user.email,
       }}
+      adminEmails={adminEmails}
     />
   );
 }
-
