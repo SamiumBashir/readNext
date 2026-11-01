@@ -9,6 +9,8 @@
 const DEFAULT_ADMIN_EMAILS = [
   "samaufa36@gmail.com",
   "samiumbashirbosunia@gmail.com",
+  "admin@admin.com",
+  "name@name.com",
 ];
 
 export function getAdminEmails(): string[] {

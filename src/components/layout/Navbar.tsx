@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
+import { isUserAdmin } from "@/lib/admin";
 import {
   BookOpen,
   Menu,
@@ -14,6 +15,7 @@ import {
   ChevronDown,
   Bookmark,
   Sparkles,
+  ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -106,7 +108,17 @@ export default function Navbar() {
             {isPending ? (
               <div className="h-10 w-28 bg-[#E8E2D8]/60 animate-pulse rounded-full" />
             ) : session?.user ? (
-              <div className="relative">
+              <>
+                {isUserAdmin(session.user) && (
+                  <Link
+                    href="/admin"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold text-white bg-[#174B32] hover:bg-[#103B29] transition-all shadow-xs"
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#F4A623]" />
+                    <span>Admin Dashboard</span>
+                  </Link>
+                )}
+                <div className="relative">
                 <button
                   type="button"
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
@@ -153,6 +165,16 @@ export default function Navbar() {
                       </div>
 
                       <div className="py-1">
+                        {isUserAdmin(session.user) && (
+                          <Link
+                            href="/admin"
+                            onClick={() => setUserDropdownOpen(false)}
+                            className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-semibold text-[#174B32] bg-emerald-50 hover:bg-emerald-100 transition-colors border-b border-emerald-100"
+                          >
+                            <ShieldCheck className="w-4 h-4 text-[#F4A623]" />
+                            <span>Admin Dashboard</span>
+                          </Link>
+                        )}
                         <Link
                           href="/profile"
                           onClick={() => setUserDropdownOpen(false)}
@@ -185,6 +207,7 @@ export default function Navbar() {
                   </>
                 )}
               </div>
+            </>
             ) : (
               <div className="flex items-center gap-2">
                 <Link
@@ -280,6 +303,17 @@ export default function Navbar() {
                     </p>
                   </div>
                 </div>
+
+                {isUserAdmin(session.user) && (
+                  <Link
+                    href="/admin"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-[#174B32] hover:bg-[#103B29] shadow-xs"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-[#F4A623]" />
+                    <span>Admin Dashboard</span>
+                  </Link>
+                )}
 
                 <div className="grid grid-cols-2 gap-2 pt-1">
                   <Link
