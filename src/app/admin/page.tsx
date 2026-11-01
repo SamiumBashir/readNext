@@ -22,14 +22,14 @@ export default async function AdminPage() {
     headers: await headers(),
   });
 
-  // 1. Unauthenticated visitors cannot access /admin
+  // 1. Unauthenticated visitors cannot access /admin -> redirected to dedicated admin login
   if (!session || !session.user) {
-    redirect("/login?callbackUrl=/admin");
+    redirect("/admin/login");
   }
 
-  // 2. Normal readers (non-admin) are strictly blocked from accessing /admin - immediately redirected to home
+  // 2. Normal readers (non-admin) are strictly blocked from accessing /admin -> redirected to admin login with unauthorized alert
   if (!isUserAdmin(session.user)) {
-    redirect("/");
+    redirect("/admin/login?error=unauthorized");
   }
 
   // 3. Fetch comprehensive data concurrently from MongoDB

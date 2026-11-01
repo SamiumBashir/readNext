@@ -16,6 +16,7 @@ import {
   Loader2,
   AlertCircle,
   CheckCircle2,
+  ShieldCheck,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -65,18 +66,8 @@ function LoginForm() {
         return;
       }
 
-      const isAdmin = isUserAdmin({
-        email: data.email,
-        role: (response.data as any)?.user?.role,
-      });
-
-      if (isAdmin) {
-        toast.success("Welcome back, Curator Admin!");
-        router.push(safeCallbackUrl === "/" ? "/admin" : safeCallbackUrl);
-      } else {
-        toast.success("Welcome back to ReadNest!");
-        router.push(safeCallbackUrl);
-      }
+      toast.success("Welcome back to ReadNest!");
+      router.push(safeCallbackUrl);
       router.refresh();
     } catch (err: unknown) {
       const message =
@@ -270,7 +261,7 @@ function LoginForm() {
         </form>
 
         {/* Footer Link */}
-        <div className="pt-4 border-t border-[#F4EFE6] text-center">
+        <div className="pt-4 border-t border-[#F4EFE6] text-center space-y-2">
           <p className="text-xs text-[#586860]">
             Don&apos;t have an account yet?{" "}
             <Link
@@ -280,6 +271,15 @@ function LoginForm() {
               Register here
             </Link>
           </p>
+          <div className="pt-2">
+            <Link
+              href="/admin/login"
+              className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#839189] hover:text-[#183D33] transition-colors"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-[#C88A3B]" />
+              <span>Library Curator &amp; Admin Sign In →</span>
+            </Link>
+          </div>
         </div>
       </div>
     </div>
