@@ -66,6 +66,17 @@ function LoginForm() {
         return;
       }
 
+      // Check if logged-in account is an administrator
+      const loggedInUser = response.data?.user || { email: data.email };
+      const isAdmin = isUserAdmin(loggedInUser);
+
+      if (isAdmin && safeCallbackUrl === "/") {
+        toast.success("Welcome back, Administrator! Directing to Curator Console...");
+        router.push("/admin");
+        router.refresh();
+        return;
+      }
+
       toast.success("Welcome back to ReadNest!");
       router.push(safeCallbackUrl);
       router.refresh();

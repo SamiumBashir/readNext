@@ -108,13 +108,25 @@ export default function Navbar() {
             {isPending ? (
               <div className="h-10 w-28 bg-[#E8E2D8]/60 animate-pulse rounded-full" />
             ) : session?.user ? (
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                  className="flex items-center gap-2.5 p-1.5 pr-3 rounded-full hover:bg-[#F4EFE6] border border-transparent hover:border-[#E8E2D8] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#183D33]"
-                  aria-expanded={userDropdownOpen}
-                >
+              <div className="flex items-center gap-3">
+                {/* ADMIN ONLY: Prominent Admin Dashboard button on the user interface */}
+                {isUserAdmin(session.user) && (
+                  <Link
+                    href="/admin"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#183D33] hover:bg-[#103B29] text-[#FAF8F5] text-xs font-semibold shadow-xs transition-all hover:shadow-md border border-emerald-900/30"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-[#F4A623]" />
+                    <span>Admin Dashboard</span>
+                  </Link>
+                )}
+
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                    className="flex items-center gap-2.5 p-1.5 pr-3 rounded-full hover:bg-[#F4EFE6] border border-transparent hover:border-[#E8E2D8] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#183D33]"
+                    aria-expanded={userDropdownOpen}
+                  >
                   {session.user.image && !imgError ? (
                     <div className="relative w-9 h-9 rounded-full overflow-hidden border border-[#C88A3B]/40">
                       <Image
@@ -197,6 +209,7 @@ export default function Navbar() {
                   </>
                 )}
               </div>
+            </div>
             ) : (
               <div className="flex items-center gap-2">
                 <Link

@@ -140,6 +140,16 @@ export default function AdminHeader({
           <span>{todayStr}</span>
         </div>
 
+        {/* View User Interface Link */}
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-white px-3.5 py-2.5 text-xs font-semibold text-[#174B32] shadow-2xs hover:bg-stone-50 transition-colors"
+          title="Return to the main library user interface"
+        >
+          <BookOpen className="h-4 w-4 text-[#C88A3B]" />
+          <span className="hidden sm:inline">User Interface</span>
+        </Link>
+
         {/* Add Book Primary Action Button */}
         <button
           type="button"

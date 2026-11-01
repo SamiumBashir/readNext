@@ -9,22 +9,24 @@
 const DEFAULT_ADMIN_EMAILS = [
   "samaufa36@gmail.com",
   "samiumbashirbosunia@gmail.com",
-  "admin@admin.com",
-  "name@name.com",
 ];
 
 export function getAdminEmails(): string[] {
-  const envAdmins = (
-    process.env.ADMIN_EMAILS ||
-    process.env.ADMIN_EMAIL ||
-    process.env.NEXT_PUBLIC_ADMIN_EMAILS ||
-    ""
-  )
+  const publicEnv = process.env.NEXT_PUBLIC_ADMIN_EMAILS || "";
+  const serverEnv =
+    typeof process !== "undefined" && process.env
+      ? process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL || ""
+      : "";
+
+  const combined = `${publicEnv},${serverEnv}`;
+  const envAdmins = combined
     .split(",")
     .map((e) => e.trim().toLowerCase())
     .filter(Boolean);
 
-  return Array.from(new Set([...DEFAULT_ADMIN_EMAILS, ...envAdmins]));
+  return Array.from(
+    new Set([...DEFAULT_ADMIN_EMAILS.map((e) => e.toLowerCase()), ...envAdmins])
+  );
 }
 
 export function isUserAdmin(
