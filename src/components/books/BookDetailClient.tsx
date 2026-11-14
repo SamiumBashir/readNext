@@ -33,6 +33,9 @@ export default function BookDetailClient({
   const [availableQty, setAvailableQty] = useState(book.available_quantity);
   const [hasActiveBorrow, setHasActiveBorrow] = useState(initialHasActiveBorrow);
   const [isBorrowing, setIsBorrowing] = useState(false);
+  const [imgSrc, setImgSrc] = useState(
+    book.image_url || "/images/hero-showcase.jpg"
+  );
 
   const isOutOfStock = availableQty <= 0;
 
@@ -127,12 +130,13 @@ export default function BookDetailClient({
           <div className="lg:col-span-5 flex flex-col items-center">
             <div className="relative aspect-[3/4] w-full max-w-sm rounded-2xl overflow-hidden bg-[#F4EFE6] shadow-xl border border-[#E8E2D8]">
               <Image
-                src={book.image_url}
+                src={imgSrc}
                 alt={`Cover of ${book.title}`}
                 fill
                 priority
                 sizes="(max-width: 768px) 100vw, 400px"
                 className="object-cover"
+                onError={() => setImgSrc("/images/hero-showcase.jpg")}
               />
               <div className="absolute top-4 left-4">
                 <span

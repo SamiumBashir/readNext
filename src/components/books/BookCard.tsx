@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Book } from "@/types";
@@ -9,6 +12,10 @@ interface BookCardProps {
 }
 
 export default function BookCard({ book, featured = false }: BookCardProps) {
+  const [imgSrc, setImgSrc] = useState(
+    book.image_url || "/images/hero-showcase.jpg"
+  );
+
   const getCategoryStyles = (category: string) => {
     switch (category) {
       case "Story":
@@ -29,11 +36,12 @@ export default function BookCard({ book, featured = false }: BookCardProps) {
       {/* Book Cover Container */}
       <div className="relative aspect-[3/4] w-full bg-[#F4EFE6] overflow-hidden">
         <Image
-          src={book.image_url}
+          src={imgSrc}
           alt={`Cover of ${book.title}`}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover transition-transform duration-500 group-hover:scale-105"
+          onError={() => setImgSrc("/images/hero-showcase.jpg")}
         />
 
         {/* Category Badge */}
