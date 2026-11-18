@@ -61,7 +61,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 bg-[#FAF8F5]/90 backdrop-blur-md border-b border-[#E8E2D8]/80 transition-all shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14 sm:h-16">
-          {/* Brand Logo - Minimalist & Compact */}
+          {/* Brand Logo */}
           <Link
             href="/"
             className="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#183D33] rounded-lg py-1"
@@ -79,7 +79,7 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* Center Navigation Links - Minimalist Floating Pill (Desktop & Tablet) */}
+          {/* Center Navigation Links - Desktop & Tablet */}
           <nav className="hidden md:flex items-center gap-0.5 bg-[#F4EFE6]/70 p-1 rounded-full border border-[#E8E2D8]/70 backdrop-blur-xs">
             {navLinks.map((link) => {
               const isActive =
@@ -103,17 +103,17 @@ export default function Navbar() {
             })}
           </nav>
 
-          {/* Right Action Area - Streamlined & Minimalist */}
-          <div className="hidden md:flex items-center gap-2.5">
+          {/* Desktop Right Action Area: ONLY shown on normal/desktop screens (NO hamburger here) */}
+          <div className="hidden md:flex items-center gap-3">
             {isPending ? (
               <div className="h-8 w-24 bg-[#E8E2D8]/50 animate-pulse rounded-full" />
             ) : session?.user ? (
-              <div className="flex items-center gap-2">
-                {/* Admin Quick Switcher - Sleek pill */}
+              /* State A: User is SIGNED IN -> Show Admin button (if admin) + User Profile Avatar & Name */
+              <div className="flex items-center gap-2.5">
                 {isUserAdmin(session.user) && (
                   <Link
                     href="/admin"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#183D33] hover:bg-[#122E26] text-[#FAF8F5] text-xs font-semibold shadow-2xs hover:shadow-xs transition-all border border-emerald-900/30"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#183D33] hover:bg-[#122E26] text-[#FAF8F5] text-xs font-semibold shadow-2xs hover:shadow-xs transition-all border border-emerald-900/30"
                     title="Curator Administration Panel"
                   >
                     <ShieldCheck className="w-3.5 h-3.5 text-[#F4A623]" />
@@ -122,12 +122,12 @@ export default function Navbar() {
                   </Link>
                 )}
 
-                {/* User Dropdown Trigger */}
+                {/* Profile Pill with Avatar & User Name */}
                 <div className="relative">
                   <button
                     type="button"
                     onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                    className="flex items-center gap-2 p-1 pl-1 pr-2.5 rounded-full hover:bg-[#F4EFE6]/80 border border-transparent hover:border-[#E8E2D8] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#183D33] cursor-pointer"
+                    className="flex items-center gap-2 p-1 pl-1.5 pr-3 rounded-full bg-white/70 hover:bg-[#F4EFE6] border border-[#E8E2D8]/80 hover:border-[#E8E2D8] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#183D33] cursor-pointer shadow-2xs"
                     aria-expanded={userDropdownOpen}
                     aria-label="User account menu"
                   >
@@ -147,13 +147,13 @@ export default function Navbar() {
                         {getInitials(session.user.name)}
                       </div>
                     )}
-                    <span className="text-xs font-semibold text-[#1D2622] max-w-[100px] truncate hidden sm:inline">
+                    <span className="text-xs font-semibold text-[#1D2622] max-w-[130px] truncate">
                       {session.user.name || "Member"}
                     </span>
                     <ChevronDown className="w-3 h-3 text-[#839189]" />
                   </button>
 
-                  {/* Dropdown Menu - Sleek & Modern */}
+                  {/* Dropdown Menu */}
                   {userDropdownOpen && (
                     <>
                       <div
@@ -215,12 +215,13 @@ export default function Navbar() {
                 </div>
               </div>
             ) : (
-              <div className="flex items-center gap-1.5">
+              /* State B: User is NOT signed in -> Show clear SignIn & Join options */
+              <div className="flex items-center gap-2">
                 <Link
                   href="/login"
-                  className="px-3.5 py-1.5 text-xs font-medium text-[#183D33] hover:text-[#122E26] hover:bg-[#F4EFE6] rounded-full transition-colors"
+                  className="px-4 py-1.5 text-xs font-semibold text-[#183D33] hover:text-[#122E26] hover:bg-[#F4EFE6] rounded-full transition-colors"
                 >
-                  Log In
+                  Sign In
                 </Link>
                 <Link
                   href="/register"
@@ -232,25 +233,50 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile Hamburger Button - Compact & Clean */}
-          <div className="flex md:hidden items-center">
+          {/* Mobile Right Area: ONLY visible on responsive/mobile devices (< 768px) */}
+          <div className="flex md:hidden items-center gap-2">
+            {/* Quick avatar link if user is signed in on mobile */}
+            {session?.user && (
+              <Link
+                href="/profile"
+                className="relative w-7 h-7 rounded-full overflow-hidden border border-[#C88A3B]/40 ring-1 ring-black/5 shrink-0"
+                title={session.user.name || "Profile"}
+              >
+                {session.user.image && !imgError ? (
+                  <Image
+                    src={session.user.image}
+                    alt={session.user.name || "User"}
+                    fill
+                    className="object-cover"
+                    unoptimized
+                    onError={() => setImgError(true)}
+                  />
+                ) : (
+                  <div className="w-full h-full bg-[#183D33] text-[#FAF8F5] flex items-center justify-center text-[10px] font-bold">
+                    {getInitials(session.user.name)}
+                  </div>
+                )}
+              </Link>
+            )}
+
+            {/* Hamburger Toggle Button - Responsive Only */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-1.5 rounded-xl text-[#183D33] hover:bg-[#F4EFE6] transition-colors focus:outline-none focus:ring-2 focus:ring-[#183D33] cursor-pointer"
+              className="w-9 h-9 rounded-full bg-[#F4EFE6]/80 hover:bg-[#F4EFE6] border border-[#E8E2D8] flex items-center justify-center text-[#183D33] transition-colors focus:outline-none focus:ring-2 focus:ring-[#183D33] cursor-pointer"
               aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? (
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               ) : (
-                <Menu className="w-5 h-5" />
+                <Menu className="w-4 h-4" />
               )}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Drawer / Collapse - Polished & Responsive */}
+      {/* Mobile Drawer / Collapse - Responsive Only */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-[#E8E2D8] bg-[#FAF8F5]/95 backdrop-blur-md px-4 pt-3 pb-5 space-y-3 shadow-lg animate-in slide-in-from-top-2 duration-150">
           <nav className="flex flex-col space-y-1">
@@ -347,7 +373,7 @@ export default function Navbar() {
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex-1 text-center py-2 rounded-xl text-xs font-semibold text-[#183D33] bg-[#F4EFE6] hover:bg-[#eae4d9] transition-colors"
                 >
-                  Log In
+                  Sign In
                 </Link>
                 <Link
                   href="/register"
