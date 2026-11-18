@@ -8,12 +8,9 @@ import { authClient } from "@/lib/auth-client";
 import { isUserAdmin } from "@/lib/admin";
 import {
   BookOpen,
-  Menu,
-  X,
   User,
   LogOut,
   ChevronDown,
-  Bookmark,
   Sparkles,
   ShieldCheck,
 } from "lucide-react";
@@ -23,7 +20,6 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [imgError, setImgError] = useState(false);
 
@@ -32,7 +28,6 @@ export default function Navbar() {
       await authClient.signOut();
       toast.success("You have been signed out.");
       setUserDropdownOpen(false);
-      setMobileMenuOpen(false);
       router.push("/");
       router.refresh();
     } catch (error) {
@@ -59,28 +54,23 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 bg-[#FAF8F5]/90 backdrop-blur-md border-b border-[#E8E2D8]/80 transition-all shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-14 sm:h-16">
-          {/* Brand Logo */}
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14 sm:h-16 gap-2">
+          {/* Brand Logo - Minimalist & Compact */}
           <Link
             href="/"
-            className="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#183D33] rounded-lg py-1"
+            className="flex items-center gap-2 sm:gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#183D33] rounded-lg py-1 shrink-0"
           >
             <div className="w-8 h-8 rounded-lg bg-[#183D33] flex items-center justify-center text-[#FAF8F5] shadow-xs group-hover:bg-[#122E26] transition-all group-hover:scale-105">
               <BookOpen className="w-4 h-4 text-[#FAF8F5]" />
             </div>
-            <div className="flex items-baseline gap-1.5">
-              <span className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-[#183D33]">
-                ReadNest
-              </span>
-              <span className="hidden lg:inline text-[9px] font-sans font-bold tracking-widest uppercase text-[#839189]">
-                Library
-              </span>
-            </div>
+            <span className="font-serif text-lg sm:text-2xl font-bold tracking-tight text-[#183D33]">
+              ReadNest
+            </span>
           </Link>
 
-          {/* Center Navigation Links - Desktop & Tablet */}
-          <nav className="hidden md:flex items-center gap-0.5 bg-[#F4EFE6]/70 p-1 rounded-full border border-[#E8E2D8]/70 backdrop-blur-xs">
+          {/* Center Navigation Links - Floating Pill (Clean & Always Visible) */}
+          <nav className="flex items-center gap-0.5 sm:gap-1 bg-[#F4EFE6]/70 p-1 rounded-full border border-[#E8E2D8]/70 backdrop-blur-xs">
             {navLinks.map((link) => {
               const isActive =
                 link.href === "/"
@@ -91,7 +81,7 @@ export default function Navbar() {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`px-4 py-1.5 rounded-full text-xs sm:text-[13px] font-medium transition-all duration-200 ${
+                  className={`px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-[13px] font-medium transition-all duration-200 whitespace-nowrap ${
                     isActive
                       ? "bg-[#183D33] text-[#FAF8F5] shadow-xs"
                       : "text-[#586860] hover:text-[#183D33] hover:bg-[#FAF8F5]/80"
@@ -103,22 +93,22 @@ export default function Navbar() {
             })}
           </nav>
 
-          {/* Desktop Right Action Area: ONLY shown on normal/desktop screens (NO hamburger here) */}
-          <div className="hidden md:flex items-center gap-3">
+          {/* Right Action Area: Direct Log In or User Profile / Name (NO hamburger icon) */}
+          <div className="flex items-center gap-2 shrink-0">
             {isPending ? (
-              <div className="h-8 w-24 bg-[#E8E2D8]/50 animate-pulse rounded-full" />
+              <div className="h-8 w-20 bg-[#E8E2D8]/50 animate-pulse rounded-full" />
             ) : session?.user ? (
               /* State A: User is SIGNED IN -> Show Admin button (if admin) + User Profile Avatar & Name */
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2">
                 {isUserAdmin(session.user) && (
                   <Link
                     href="/admin"
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#183D33] hover:bg-[#122E26] text-[#FAF8F5] text-xs font-semibold shadow-2xs hover:shadow-xs transition-all border border-emerald-900/30"
+                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#183D33] hover:bg-[#122E26] text-[#FAF8F5] text-xs font-semibold shadow-2xs hover:shadow-xs transition-all border border-emerald-900/30"
                     title="Curator Administration Panel"
                   >
                     <ShieldCheck className="w-3.5 h-3.5 text-[#F4A623]" />
-                    <span className="hidden lg:inline">Admin Dashboard</span>
-                    <span className="lg:hidden">Admin</span>
+                    <span className="hidden md:inline">Admin Dashboard</span>
+                    <span className="md:hidden">Admin</span>
                   </Link>
                 )}
 
@@ -127,12 +117,12 @@ export default function Navbar() {
                   <button
                     type="button"
                     onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                    className="flex items-center gap-2 p-1 pl-1.5 pr-3 rounded-full bg-white/70 hover:bg-[#F4EFE6] border border-[#E8E2D8]/80 hover:border-[#E8E2D8] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#183D33] cursor-pointer shadow-2xs"
+                    className="flex items-center gap-1.5 sm:gap-2 p-1 sm:pl-1.5 sm:pr-3 rounded-full bg-white/70 hover:bg-[#F4EFE6] border border-[#E8E2D8]/80 hover:border-[#E8E2D8] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#183D33] cursor-pointer shadow-2xs"
                     aria-expanded={userDropdownOpen}
                     aria-label="User account menu"
                   >
                     {session.user.image && !imgError ? (
-                      <div className="relative w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden border border-[#C88A3B]/40 ring-1 ring-white/60">
+                      <div className="relative w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden border border-[#C88A3B]/40 ring-1 ring-white/60 shrink-0">
                         <Image
                           src={session.user.image}
                           alt={session.user.name || "User Avatar"}
@@ -143,11 +133,11 @@ export default function Navbar() {
                         />
                       </div>
                     ) : (
-                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#183D33] text-[#FAF8F5] flex items-center justify-center text-[11px] font-bold tracking-wider">
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#183D33] text-[#FAF8F5] flex items-center justify-center text-[11px] font-bold tracking-wider shrink-0">
                         {getInitials(session.user.name)}
                       </div>
                     )}
-                    <span className="text-xs font-semibold text-[#1D2622] max-w-[130px] truncate">
+                    <span className="text-xs font-semibold text-[#1D2622] max-w-[80px] sm:max-w-[120px] truncate hidden sm:inline">
                       {session.user.name || "Member"}
                     </span>
                     <ChevronDown className="w-3 h-3 text-[#839189]" />
@@ -215,178 +205,25 @@ export default function Navbar() {
                 </div>
               </div>
             ) : (
-              /* State B: User is NOT signed in -> Show clear SignIn & Join options */
-              <div className="flex items-center gap-2">
+              /* State B: User is NOT logged in -> Direct Log In button (NO hamburger menu) */
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <Link
                   href="/login"
-                  className="px-4 py-1.5 text-xs font-semibold text-[#183D33] hover:text-[#122E26] hover:bg-[#F4EFE6] rounded-full transition-colors"
+                  className="px-3.5 sm:px-4 py-1.5 text-xs font-semibold text-[#183D33] hover:text-[#122E26] hover:bg-[#F4EFE6] rounded-full transition-colors border border-transparent hover:border-[#E8E2D8]"
                 >
-                  Sign In
+                  Log In
                 </Link>
                 <Link
                   href="/register"
-                  className="px-4 py-1.5 text-xs font-semibold text-[#FAF8F5] bg-[#183D33] hover:bg-[#122E26] rounded-full shadow-2xs hover:shadow-xs transition-all"
+                  className="hidden sm:inline-flex px-4 py-1.5 text-xs font-semibold text-[#FAF8F5] bg-[#183D33] hover:bg-[#122E26] rounded-full shadow-2xs hover:shadow-xs transition-all"
                 >
                   Join
                 </Link>
               </div>
             )}
           </div>
-
-          {/* Mobile Right Area: ONLY visible on responsive/mobile devices (< 768px) */}
-          <div className="flex md:hidden items-center gap-2">
-            {/* Quick avatar link if user is signed in on mobile */}
-            {session?.user && (
-              <Link
-                href="/profile"
-                className="relative w-7 h-7 rounded-full overflow-hidden border border-[#C88A3B]/40 ring-1 ring-black/5 shrink-0"
-                title={session.user.name || "Profile"}
-              >
-                {session.user.image && !imgError ? (
-                  <Image
-                    src={session.user.image}
-                    alt={session.user.name || "User"}
-                    fill
-                    className="object-cover"
-                    unoptimized
-                    onError={() => setImgError(true)}
-                  />
-                ) : (
-                  <div className="w-full h-full bg-[#183D33] text-[#FAF8F5] flex items-center justify-center text-[10px] font-bold">
-                    {getInitials(session.user.name)}
-                  </div>
-                )}
-              </Link>
-            )}
-
-            {/* Hamburger Toggle Button - Responsive Only */}
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="w-9 h-9 rounded-full bg-[#F4EFE6]/80 hover:bg-[#F4EFE6] border border-[#E8E2D8] flex items-center justify-center text-[#183D33] transition-colors focus:outline-none focus:ring-2 focus:ring-[#183D33] cursor-pointer"
-              aria-label="Toggle navigation menu"
-            >
-              {mobileMenuOpen ? (
-                <X className="w-4 h-4" />
-              ) : (
-                <Menu className="w-4 h-4" />
-              )}
-            </button>
-          </div>
         </div>
       </div>
-
-      {/* Mobile Drawer / Collapse - Responsive Only */}
-      {mobileMenuOpen && (
-        <div className="md:hidden border-t border-[#E8E2D8] bg-[#FAF8F5]/95 backdrop-blur-md px-4 pt-3 pb-5 space-y-3 shadow-lg animate-in slide-in-from-top-2 duration-150">
-          <nav className="flex flex-col space-y-1">
-            {navLinks.map((link) => {
-              const isActive =
-                link.href === "/"
-                  ? pathname === "/"
-                  : pathname.startsWith(link.href);
-
-              return (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`px-3.5 py-2.5 rounded-xl text-sm font-medium flex items-center justify-between transition-colors ${
-                    isActive
-                      ? "bg-[#183D33] text-[#FAF8F5]"
-                      : "text-[#1D2622] hover:bg-[#F4EFE6]"
-                  }`}
-                >
-                  <span>{link.name}</span>
-                  {link.protected && (
-                    <Bookmark className="w-3.5 h-3.5 opacity-60" />
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div className="pt-2 border-t border-[#E8E2D8]/80">
-            {session?.user ? (
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-2.5 px-2 py-1">
-                  {session.user.image && !imgError ? (
-                    <div className="relative w-8 h-8 rounded-full overflow-hidden border border-[#C88A3B]/40 shrink-0">
-                      <Image
-                        src={session.user.image}
-                        alt={session.user.name || "User"}
-                        fill
-                        className="object-cover"
-                        unoptimized
-                        onError={() => setImgError(true)}
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-[#183D33] text-[#FAF8F5] flex items-center justify-center text-xs font-bold shrink-0">
-                      {getInitials(session.user.name)}
-                    </div>
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs font-bold text-[#183D33] truncate">
-                      {session.user.name}
-                    </p>
-                    <p className="text-[11px] text-[#839189] truncate">
-                      {session.user.email}
-                    </p>
-                  </div>
-                </div>
-
-                {isUserAdmin(session.user) && (
-                  <Link
-                    href="/admin"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold text-white bg-[#174B32] hover:bg-[#103B29] shadow-2xs transition-colors"
-                  >
-                    <ShieldCheck className="w-3.5 h-3.5 text-[#F4A623]" />
-                    <span>Admin Dashboard</span>
-                  </Link>
-                )}
-
-                <div className="grid grid-cols-2 gap-2 pt-1">
-                  <Link
-                    href="/profile/edit"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-center gap-1 py-2 px-2.5 rounded-xl text-xs font-semibold bg-[#F4EFE6] text-[#183D33] hover:bg-[#e9e3d8] transition-colors"
-                  >
-                    <Sparkles className="w-3 h-3 text-[#C88A3B]" />
-                    <span>Edit Profile</span>
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={handleSignOut}
-                    className="flex items-center justify-center gap-1 py-2 px-2.5 rounded-xl text-xs font-semibold bg-red-50 text-red-600 hover:bg-red-100 transition-colors cursor-pointer"
-                  >
-                    <LogOut className="w-3 h-3" />
-                    <span>Log Out</span>
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 pt-1">
-                <Link
-                  href="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex-1 text-center py-2 rounded-xl text-xs font-semibold text-[#183D33] bg-[#F4EFE6] hover:bg-[#eae4d9] transition-colors"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/register"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex-1 text-center py-2 rounded-xl text-xs font-semibold text-[#FAF8F5] bg-[#183D33] hover:bg-[#122E26] transition-colors"
-                >
-                  Join ReadNest
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </header>
   );
 }
